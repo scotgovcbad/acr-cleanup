@@ -1,0 +1,11 @@
+name: Test the action is callable and runs
+
+on: 
+  [workflow_dispatch]
+
+jobs:
+  test-action:
+    name: Call the action from this repo to see how it runs.
+    runs-on: ubuntu-latest
+    steps:
+    - uses: scotgovcbad/acr-cleanup@9ff41e9
