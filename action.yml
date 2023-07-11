@@ -3,7 +3,7 @@ description: 'An action which will clean-up the given Azure Container Registry r
 
 inputs:
   number-to-keep:
-    description: 'The number of images matching your tag input which you'd like to keep'
+    description: 'The number of images matching your tag input which you would like to keep'
     required: true
     default: 3
   tag:

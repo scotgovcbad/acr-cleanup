@@ -9,3 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: scotgovcbad/acr-cleanup@master
+      with:
+        number-to-keep: 4
+        tag: 'micle'
+        container-registry: 'micle'
+        repo: 'micle'
+        strictness: 'Lenient'
