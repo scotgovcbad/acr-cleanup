@@ -8,4 +8,4 @@ jobs:
     name: Call the action from this repo to see how it runs.
     runs-on: ubuntu-latest
     steps:
-    - uses: scotgovcbad/acr-cleanup@9ff41e9
+    - uses: scotgovcbad/acr-cleanup@master
