@@ -1,0 +1,35 @@
+name: 'Azure Container Registry Cleanup'
+description: 'An action which will clean-up the given Azure Container Registry repository. It will find the date of the n-th most recent container image whose tag contains a given string and purge all container images created before that date.'
+
+inputs:
+  number-to-keep:
+    description: 'The number of images matching your tag input which you'd like to keep'
+    required: true
+    default: 3
+  tag:
+    description: 'The tag to be searched for.'
+    required: true
+    type: string
+  container-registry:
+    description: 'The name of your container registry, the bit that goes in the square brackets of [container-registry].azurecr.io'
+    required: true
+    type: string
+  repo:
+    description: 'The repository within the container registry'
+    required: true
+    type: string    
+  strictness:
+    description: 'Strict cleanup will keep only the number of images which match your tag input. Lenient cleanup will keep any images younger than the n-th most recent container image which matches your tag input'
+    required: true
+    type: choice
+    options:
+      - 'Strict'
+      - 'Lenient'    
+
+
+runs:
+  using: composite
+  steps:
+  - name: 'Running PowerShell Script'
+    shell: pwsh
+    run: Invoke-RestMethod -Uri https://api.chucknorris.io/jokes/random | Select-Object -ExpandProperty value
