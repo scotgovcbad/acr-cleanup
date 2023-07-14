@@ -30,6 +30,10 @@ inputs:
 runs:
   using: composite
   steps:
-  - name: 'Running PowerShell Script'
+  - name: Cleanse images from Azure Container Registry
     shell: pwsh
-    run: Invoke-RestMethod -Uri https://api.chucknorris.io/jokes/random | Select-Object -ExpandProperty value
+    run: ./AcrCleanupScript.ps1 -ContainerRegistry ${{ inputs.container-registry }} `
+        -Repository ${{ inputs.repo }} `
+        -Strictness ${{ inputs.strictness }} `
+        -TagToKeep ${{ inputs.tag }} `
+        -NumberImagesToKeep ${{ inputs.number-to-keep }}
