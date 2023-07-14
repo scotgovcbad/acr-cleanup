@@ -31,12 +31,15 @@ runs:
   using: composite
   steps:
   - name: show current directory
+    shell: bash
     run: pwd
 
   - name: list contents of current directory
+    shell: bash
     run: ls
 
   - name: list contents of parent directory
+    shell: bash
     run: ls ..
 
   - name: Cleanse images from Azure Container Registry
