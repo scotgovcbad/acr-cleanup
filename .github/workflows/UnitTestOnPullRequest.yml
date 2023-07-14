@@ -15,4 +15,5 @@ jobs:
         ref: ${{ github.event.pull_request.head.ref }}
 
     - name: Test
+      shell: pwsh
       run: Invoke-Pester
