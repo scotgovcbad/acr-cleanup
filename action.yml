@@ -32,7 +32,7 @@ runs:
   steps:
   - name: Cleanse images from Azure Container Registry
     shell: pwsh
-    run: ./AcrCleanupScript.ps1 -ContainerRegistry ${{ inputs.container-registry }} `
+    run: $PSScriptRoot/AcrCleanupScript.ps1 -ContainerRegistry ${{ inputs.container-registry }} `
         -Repository ${{ inputs.repo }} `
         -Strictness ${{ inputs.strictness }} `
         -TagToKeep ${{ inputs.tag }} `
