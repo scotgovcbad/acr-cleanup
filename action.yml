@@ -30,22 +30,7 @@ inputs:
 runs:
   using: composite
   steps:
-  - name: show current directory
-    shell: bash
-    run: pwd
-
-  - name: list contents of current directory
-    shell: bash
-    run: ls
-
-  - name: list contents of parent directory
-    shell: bash
-    run: ls ..
-
-  - name: Show tree
-    shell: bash
-    run: tree /home/bin
 
   - name: Cleanse images from Azure Container Registry
     shell: pwsh
-    run: ./AcrCleanupScript.ps1 -ContainerRegistry ${{ inputs.container-registry }} -Repository ${{ inputs.repo }} -Strictness ${{ inputs.strictness }} -TagToKeep ${{ inputs.tag }} -NumberImagesToKeep ${{ inputs.number-to-keep }}
+    run: /home/runner/work/_actions/scotgovcbad/acr-cleanup/master/AcrCleanupScript.ps1 -ContainerRegistry ${{ inputs.container-registry }} -Repository ${{ inputs.repo }} -Strictness ${{ inputs.strictness }} -TagToKeep ${{ inputs.tag }} -NumberImagesToKeep ${{ inputs.number-to-keep }}
