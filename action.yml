@@ -30,6 +30,15 @@ inputs:
 runs:
   using: composite
   steps:
+  - name: show current directory
+    run: pwd
+
+  - name: list contents of current directory
+    run: ls
+
+  - name: list contents of parent directory
+    run: ls ..
+
   - name: Cleanse images from Azure Container Registry
     shell: pwsh
     run: ./AcrCleanupScript.ps1 -ContainerRegistry ${{ inputs.container-registry }} -Repository ${{ inputs.repo }} -Strictness ${{ inputs.strictness }} -TagToKeep ${{ inputs.tag }} -NumberImagesToKeep ${{ inputs.number-to-keep }}
