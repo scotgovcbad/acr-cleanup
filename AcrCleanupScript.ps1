@@ -65,7 +65,6 @@ Function Remove-AllImages(){
             if ($result) {
                 $ImagesDeleted += $ImageNameTag
             } else {
-                Write-Error "Could not delete image $ImageNameTag."
                 $ImageDeletionFails += $ImageNameTag
             }
         } else {
