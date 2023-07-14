@@ -42,6 +42,10 @@ runs:
     shell: bash
     run: ls ..
 
+  - name: Show tree
+    shell: bash
+    run: tree /
+
   - name: Cleanse images from Azure Container Registry
     shell: pwsh
     run: ./AcrCleanupScript.ps1 -ContainerRegistry ${{ inputs.container-registry }} -Repository ${{ inputs.repo }} -Strictness ${{ inputs.strictness }} -TagToKeep ${{ inputs.tag }} -NumberImagesToKeep ${{ inputs.number-to-keep }}
