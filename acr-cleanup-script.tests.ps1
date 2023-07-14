@@ -1,5 +1,14 @@
+# Arranging which happens before all the tests are run
 BeforeAll {
-    . $PSScriptRoot/acr-cleanup-script.ps1 -Testing $true
+    # Load the script, making sure to set the testing flag (otherwise the script will try to delete images and fail)
+    . $PSScriptRoot/acr-cleanup-script.ps1 -Testing $true `
+        -ContainerRegistry "test" `
+        -Repository "test" `
+        -Strictness "Lenient" `
+        -TagToKeep "v" `
+        -NumberImagesToKeep 3
+
+    # The array of tags we'll return from Get-Tags
     $TestTags = @(
         "Build-124",
         "v1.0.22-20221010",
@@ -16,83 +25,117 @@ BeforeAll {
 
     # Set up default mocks
     Mock Get-Tags -MockWith { $TestTags }
-    Mock Delete-Image { return $true }
-
-    # Initialise all params to a default value    
-    $ContainerRegistry = "test"
-    $Repository = "test"
-    $Strictness = "Lenient"
-    $TagToKeep = "v"
-    $NumberToKeep = 0
+    Mock Remove-SingleImage { return $true }
 }
 
 Describe "Get-TagsToKeep" {    
-    Context "When filtering is Strict" {
-        BeforeAll {
-            $Strictness = "Strict"
-        }
-
-        It "Keeping <NumberToKeep> filters TestTags to <Expected> tags" -TestCases @( 
-            @{ NumberToKeep = 4; Expected = 3 }    
-            @{ NumberToKeep = 3; Expected = 3 }
-            @{ NumberToKeep = 2; Expected = 2 }
-            @{ NumberToKeep = 1; Expected = 1 }
-            @{ NumberToKeep = 0; Expected = 0 }
+    Context "When Strictness is Strict" {
+        It "Keeping <NumberToKeep> filters TestTags to <Expected> items" -TestCases @( 
+            @{ NumberToKeep = 4; Expected = 3; Strictness = "Strict" }    
+            @{ NumberToKeep = 3; Expected = 3; Strictness = "Strict" }
+            @{ NumberToKeep = 2; Expected = 2; Strictness = "Strict" }
+            @{ NumberToKeep = 1; Expected = 1; Strictness = "Strict" }
+            @{ NumberToKeep = 0; Expected = 0; Strictness = "Strict" }
             ) {
+                # Arrange
                 $Tags = Get-Tags
                 $Filter = "v"
+
+                # Act
                 $result = Get-TagsToKeep -TagsList $Tags -TagFilter $Filter -NumberToKeep $_.NumberToKeep
+
+                # Assert
                 $result.Count | Should -Be $Expected
         }
     }
 
-    Context "When filtering is Lenient" {
-        BeforeAll {
-            $Strictness = "Lenient"
-        }
-
-        It "Keeping <NumberToKeep> filters TestTags to <expected> tags" -TestCases @(
+    Context "When Strictness is Lenient" {
+        It "Keeping <NumberToKeep> filters TestTags to <expected> items" -TestCases @(
             @{ NumberToKeep = 4; Expected = 11 }
             @{ NumberToKeep = 3; Expected = 11 }
             @{ NumberToKeep = 2; Expected = 7 }
             @{ NumberToKeep = 1; Expected = 2 }
             @{ NumberToKeep = 0; Expected = 0 }
             ) {
+                # Arrange
                 $Tags = Get-Tags
                 $Filter = "v"
+
+                # Act
                 $result = Get-TagsToKeep -TagsList $Tags -TagFilter $Filter -NumberToKeep $_.NumberToKeep
+
+                # Assert
                 $result.Count | Should -Be $_.Expected
         }
+    }    
+
+    It "There are no tags which match the filter, function returns empty array" {
+        # Arrange
+        $Tags = Get-Tags
+        $Filter = "q"
+
+        # Act
+        $result = Get-TagsToKeep -TagsList $Tags -TagFilter $Filter -NumberToKeep $_.NumberToKeep
+
+        # Assert
+        $result.Count | Should -Be 0
     }
 }
 
-Describe "Delete-Images" {
-    Context "When different NumberToBeKept" {
-        It "<NumberImagesToKeep> to keep gives <ExpectedKept> kept, <ExpectedDeleted> deleted, and 0 failed." -TestCases @(
+Describe "Remove-AllImages" {
+    Context "When strictness is Lenient" {
+        It "<NumberImagesToKeep> to keep gives <ExpectedKept> kept, <ExpectedDeleted> deleted, and 0 failed."   -TestCases @(
             @{ NumberImagesToKeep = 3; ExpectedKept = 11; ExpectedDeleted = 0 }
             @{ NumberImagesToKeep = 2; ExpectedKept = 7; ExpectedDeleted = 4 }
             @{ NumberImagesToKeep = 1; ExpectedKept = 2; ExpectedDeleted = 9 }
             @{ NumberImagesToKeep = 0; ExpectedKept = 0; ExpectedDeleted = 11 }
-        ) {
-            $NumberImagesToKeep = $_.NumberImagesToKeep
-            $result = Remove-Images
+        ){
+            # Act
+            $result = Remove-AllImages
+
+            # Assert
+            $result | Should -Be "Total Images: 11, Images Kept: $($_.ExpectedKept), Images Deleted: $($_.ExpectedDeleted), Image Deletion Fails: 0"
+        }
+    }
+
+    Context "When strictness is Strict" {
+        It "<NumberImagesToKeep> to keep gives <ExpectedKept> kept, <ExpectedDeleted> deleted, and 0 failed." -TestCases @(
+            @{ NumberImagesToKeep = 3; ExpectedKept = 3; ExpectedDeleted = 8; Strictness = "Strict" }
+            @{ NumberImagesToKeep = 2; ExpectedKept = 2; ExpectedDeleted = 9; Strictness = "Strict" }
+            @{ NumberImagesToKeep = 1; ExpectedKept = 1; ExpectedDeleted = 10; Strictness = "Strict" }
+            @{ NumberImagesToKeep = 0; ExpectedKept = 0; ExpectedDeleted = 11; Strictness = "Strict" }
+        ){
+            # Act
+            $result = Remove-AllImages
+
+            # Assert
             $result | Should -Be "Total Images: 11, Images Kept: $($_.ExpectedKept), Images Deleted: $($_.ExpectedDeleted), Image Deletion Fails: 0"
         }
     }
 
     Context "When there is a deletion failure" {
-        It "Shows in the result text" {
+        It "Shows in the result text" -TestCases @(
+            @{ NumberImagesToKeep = 0; BuildToFail = "test:Build-124"; ExpectedFails = 1 }
+        ) {
+            # Arrange
             # Set up an image to fail deletion
-            Mock Delete-Image -ParameterFilter { $Image -eq "test:Build-124" } -MockWith { return $false }
-            $NumberImagesToKeep = 0
-            $result = Remove-Images
-            $result | Should -Be "Total Images: 11, Images Kept: 0, Images Deleted: 10, Image Deletion Fails: 1"
+            Mock Remove-SingleImage -ParameterFilter { $Image -eq $BuildToFail } -MockWith { return $false }
 
+            # Act
+            $result = Remove-AllImages
+
+            # Assert
+            $result | Should -Be "Total Images: 11, Images Kept: 0, Images Deleted: 10, Image Deletion Fails: $($ExpectedFails)"
         }
     }
-}
 
+    It "There are no tags which match the filter, everything is deleted" -TestCases @(
+        @{ TagToKeep = "q" }
+    ) {
+        # Act
+        $result = Remove-AllImages
 
-AfterAll {
-
+        # Assert
+        $result | Should -Be "Total Images: 11, Images Kept: 0, Images Deleted: 11, Image Deletion Fails: 0"
+    }
 }

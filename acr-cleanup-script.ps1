@@ -15,7 +15,7 @@ Function Get-Tags(){
 }
 
 # Wrapper function so we can mock this behaviour
-Function Delete-Image($Image){
+Function Remove-SingleImage($Image){
     az acr repository delete --name $ContainerRegistry --image $Image --yes
     # Return true or false depending on if the previous line was successful
     return ($? -eq $true)
@@ -42,7 +42,7 @@ Function Get-TagsToKeep($TagsList, $TagFilter, $NumberToKeep){
     }
 }
 
-Function Remove-Images(){
+Function Remove-AllImages(){
     # Get all Tags in time descending order
     $Tags = Get-Tags
     
@@ -60,9 +60,9 @@ Function Remove-Images(){
         $ImageNameTag = $Repository + ":" + $Tag
     
         if ($TagsToKeep -NotContains $Tag){
-            $result = Delete-Image -Image $ImageNameTag
+            $result = Remove-SingleImage -Image $ImageNameTag
             # If the CLI command succeeded, then '$?' is true.
-            if ($result -eq $true) {
+            if ($result) {
                 $ImagesDeleted += $ImageNameTag
             } else {
                 Write-Error "Could not delete image $ImageNameTag."
@@ -78,6 +78,6 @@ Function Remove-Images(){
 
 if ($Testing -eq $false) {
     Write-Host "Live run, script began..."
-    Remove-Images
+    Remove-AllImages
     Write-Host "Script finished."
 }
