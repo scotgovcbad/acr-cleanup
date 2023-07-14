@@ -1,4 +1,4 @@
-name: Unit est on Pull Request
+name: Unit Test on Pull Request
 
 on: 
   workflow_dispatch:
