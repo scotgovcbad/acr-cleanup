@@ -10,15 +10,9 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with: 
         ref: ${{ github.event.pull_request.head.ref }}
 
-    - name: Add NuGet Github Source
-      run: dotnet nuget add source https://nuget.pkg.github.com/scotgovcbad/index.json --name github --username ${{secrets.PACKAGESOURCE_USERNAME}} --password ${{secrets.PACKAGESOURCE_PASSWORD}} --store-password-in-clear-text
-
-    - name: Build Web App
-      run: dotnet build WSW.Web --configuration Release
-
     - name: Test
-      run: dotnet test --filter FullyQualifiedName!~UI --configuration Release
+      run: Invoke-Pester
