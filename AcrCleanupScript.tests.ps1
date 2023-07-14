@@ -1,7 +1,7 @@
 # Arranging which happens before all the tests are run
 BeforeAll {
     # Load the script, making sure to set the testing flag (otherwise the script will try to delete images and fail)
-    . $PSScriptRoot/acr-cleanup-script.ps1 -Testing $true `
+    . $PSScriptRoot/AcrCleanupScript.ps1 -Testing $true `
         -ContainerRegistry "test" `
         -Repository "test" `
         -Strictness "Lenient" `
