@@ -44,7 +44,7 @@ runs:
 
   - name: Show tree
     shell: bash
-    run: tree /
+    run: tree /home
 
   - name: Cleanse images from Azure Container Registry
     shell: pwsh
