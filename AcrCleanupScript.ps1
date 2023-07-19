@@ -1,13 +1,12 @@
 param (
-    [string]$ContainerRegistry = "cbadcontainerregistry",
-    [string]$Repository = "wsw",
-    [string]$Strictness = "Lenient",
-    [string]$TagToKeep = "v",
-    [string]$NumberImagesToKeep = 65,
-    [switch]$Testing = $false
+    [string]$ContainerRegistry,
+    [string]$Repository,
+    [string]$Strictness,
+    [string]$TagToKeep,
+    [int]$NumberImagesToKeep = 3,
+    [switch]$Testing = $false,
+    [switch]$Interactive = $false
 )
-
-# Use these to track success/failure and provide update at the end. Keeping them as script level variables to help with unit testing
 
 # Wrapper function so we can mock this behaviour
 Function Get-Tags(){
@@ -53,13 +52,18 @@ Function Remove-AllImages(){
     $ImagesKept = @()
     $ImageDeletionFails = @()
     
+    if ($Interactive) {
+        $answer = Read-Host "This will remove $($Tags.Count - $TagsToKeep) out of $($Tags.Count) images. Do you want to continue? (y/n)"
+        if (($answer -eq "n") -or ($answer -eq "N") -or ($answer -eq "no") -or ($answer -eq "No")) { break }
+    } 
+
     # Delete images if they are older than $date or if the user wants to delete all images which do not include the TagToKeep
     foreach ($Tag in $Tags){
         # Initialise this at the start of the loop because concatenation is a bit weird if we try to do it in the middle of the az cli command.
         # Also means we can reuse it.
         $ImageNameTag = $Repository + ":" + $Tag
     
-        if ($TagsToKeep -NotContains $Tag){
+        if ($TagsToKeep -NotContains $Tag) {
             $result = Remove-SingleImage -Image $ImageNameTag
             # If the CLI command succeeded, then '$?' is true.
             if ($result) {
