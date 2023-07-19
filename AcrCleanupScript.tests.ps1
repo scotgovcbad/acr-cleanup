@@ -94,7 +94,7 @@ Describe "Remove-AllImages" {
             $result = Remove-AllImages
 
             # Assert
-            $result | Should -Be "Total Images: 11, Images Kept: $($_.ExpectedKept), Images Deleted: $($_.ExpectedDeleted), Image Deletion Fails: 0"
+            $result | Should -Be "Total Images: $($TestTags.Count), Images Kept: $($_.ExpectedKept), Images Deleted: $($_.ExpectedDeleted), Image Deletion Fails: 0"
         }
     }
 
@@ -109,7 +109,7 @@ Describe "Remove-AllImages" {
             $result = Remove-AllImages
 
             # Assert
-            $result | Should -Be "Total Images: 11, Images Kept: $($_.ExpectedKept), Images Deleted: $($_.ExpectedDeleted), Image Deletion Fails: 0"
+            $result | Should -Be "Total Images: $($TestTags.Count), Images Kept: $($_.ExpectedKept), Images Deleted: $($_.ExpectedDeleted), Image Deletion Fails: 0"
         }
     }
 
@@ -125,7 +125,7 @@ Describe "Remove-AllImages" {
             $result = Remove-AllImages
 
             # Assert
-            $result | Should -Be "Total Images: 11, Images Kept: 0, Images Deleted: 10, Image Deletion Fails: $($ExpectedFails)"
+            $result | Should -Be "Total Images: $($TestTags.Count), Images Kept: 0, Images Deleted: $($TestTags.Count - $ExpectedFails), Image Deletion Fails: $($ExpectedFails)"
         }
     }
 
@@ -136,6 +136,6 @@ Describe "Remove-AllImages" {
         $result = Remove-AllImages
 
         # Assert
-        $result | Should -Be "Total Images: 11, Images Kept: 0, Images Deleted: 11, Image Deletion Fails: 0"
+        $result | Should -Be "Total Images: $($TestTags.Count), Images Kept: 0, Images Deleted: $($TestTags.Count), Image Deletion Fails: 0"
     }
 }

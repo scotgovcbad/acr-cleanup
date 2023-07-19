@@ -4,8 +4,7 @@ param (
     [string]$Strictness,
     [string]$TagToKeep,
     [int]$NumberImagesToKeep = 3,
-    [switch]$Testing = $false,
-    [switch]$Interactive = $false
+    [switch]$Testing = $false
 )
 
 # Wrapper function so we can mock this behaviour
@@ -51,11 +50,6 @@ Function Remove-AllImages(){
     $ImagesDeleted = @()
     $ImagesKept = @()
     $ImageDeletionFails = @()
-    
-    if ($Interactive) {
-        $answer = Read-Host "This will remove $($Tags.Count - $TagsToKeep) out of $($Tags.Count) images. Do you want to continue? (y/n)"
-        if (($answer -eq "n") -or ($answer -eq "N") -or ($answer -eq "no") -or ($answer -eq "No")) { break }
-    } 
 
     # Delete images if they are older than $date or if the user wants to delete all images which do not include the TagToKeep
     foreach ($Tag in $Tags){
