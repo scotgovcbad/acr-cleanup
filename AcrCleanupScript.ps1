@@ -9,14 +9,11 @@ param (
 
 # Wrapper function so we can mock this behaviour
 Function Get-Tags(){
-    Write-Host "Gettings tags..."
-    az acr login --name $ContainerRegistry
     return (az acr repository show-tags --name $ContainerRegistry --repository $Repository --orderby time_desc --output json | ConvertFrom-Json)
 }
 
 # Wrapper function so we can mock this behaviour
 Function Remove-SingleImage($Image){
-    az acr login --name $ContainerRegistry
     az acr repository delete --name $ContainerRegistry --image $Image --yes
     # Return true or false depending on if the previous line was successful
     return ($? -eq $true)
@@ -26,7 +23,6 @@ Function Remove-SingleImage($Image){
 Function Connect-ToAzure() {
     Write-Host "Logging in..."
     $creds = ConvertFrom-Json -InputObject $env:AZURE_CREDS
-    Write-Host $creds.clientId
     az login --service-principal --username $creds.clientId --tenant $creds.tenantId  --password $creds.clientSecret
     return ($? -eq $true)
 }
