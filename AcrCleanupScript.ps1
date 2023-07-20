@@ -25,6 +25,7 @@ Function Connect-ToAzure() {
     $creds = ConvertFrom-Json -InputObject $env:AZURE_CREDS
     $creds | Get-Member
     az login --service-principal -u $creds.clientId -p $creds.clientSecret --tenant $creds.tenantId
+    az acr login --name $Repository
     return ($? -eq $true)
 }
 
