@@ -23,7 +23,7 @@ Function Remove-SingleImage($Image){
 Function Connect-ToAzure() {
     Write-Host "Logging in..."
     $creds = ConvertFrom-Json -InputObject $env:AZURE_CREDS
-    $creds | Get-Member -Force
+    Write-Host $creds.clientId
     az login --service-principal -u $creds.clientId -p $creds.clientSecret --tenant $creds.tenantId
     az acr login --name $ContainerRegistry
     return ($? -eq $true)
