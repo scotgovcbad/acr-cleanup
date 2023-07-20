@@ -9,6 +9,7 @@ param (
 
 # Wrapper function so we can mock this behaviour
 Function Get-Tags(){
+    Write-Host "Gettings tags..."
     return (az acr repository show-tags --name $ContainerRegistry --repository $Repository --orderby time_desc --output json | ConvertFrom-Json)
 }
 
@@ -30,6 +31,7 @@ Function Connect-ToAzure() {
 }
 
 Function Get-TagsToKeep($TagsList, $TagFilter, $NumberToKeep){
+    Write-Host "Filtering tags..."
     if ($NumberToKeep -eq 0){
         return @()
     }
