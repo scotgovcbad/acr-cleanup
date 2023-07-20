@@ -21,7 +21,8 @@ Function Remove-SingleImage($Image){
 
 # Yet another wrapper to assist mocking
 Function Connect-ToAzure() {
-    $creds = ConvertFrom-Json -InputObject $env:AZURE_CREDS    
+    $creds = ConvertFrom-Json -InputObject $env:AZURE_CREDS
+    $creds | Get-Member
     az login --service-principal -u $creds.clientId -p $creds.clientSecret --tenant $creds.tenantId
     return ($? -eq $true)
 }
