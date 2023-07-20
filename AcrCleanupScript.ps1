@@ -19,6 +19,13 @@ Function Remove-SingleImage($Image){
     return ($? -eq $true)
 }
 
+# Yet another wrapper to assist mocking
+Function Connect-ToAzure() {
+    $creds = ConvertFrom-Json -InputObject $env:AZURE_CREDS    
+    az login --service-principal -u $creds.clientId -p $creds.clientSecret --tenant $creds.tenantId
+    return ($? -eq $true)
+}
+
 Function Get-TagsToKeep($TagsList, $TagFilter, $NumberToKeep){
     if ($NumberToKeep -eq 0){
         return @()
