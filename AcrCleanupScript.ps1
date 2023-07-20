@@ -3,7 +3,7 @@ param (
     [string]$Repository,
     [string]$Strictness,
     [string]$TagToKeep,
-    [int]$NumberImagesToKeep = 3,
+    [int]$NumberImagesToKeep,
     [switch]$Testing = $false
 )
 
