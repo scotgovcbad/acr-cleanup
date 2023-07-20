@@ -24,7 +24,7 @@ Function Connect-ToAzure() {
     Write-Host "Logging in..."
     $creds = ConvertFrom-Json -InputObject $env:AZURE_CREDS
     Write-Host $creds.clientId
-    az login --service-principal -u $creds.clientId -p $creds.clientSecret --tenant $creds.tenantId
+    az login --service-principal --username $creds.clientId --tenant $creds.tenantId  --password $creds.clientSecret
     az acr login --name $ContainerRegistry
     return ($? -eq $true)
 }
