@@ -80,8 +80,14 @@ Function Remove-AllImages(){
     return "Total Images: $($Tags.Count), Images Kept: $($ImagesKept.Count), Images Deleted: $($ImagesDeleted.Count), Image Deletion Fails: $($ImageDeletionFails.Count)"
 }
 
+# Only run cleanup if we're not testing
 if ($Testing -eq $false) {
     Write-Host "Live run, script began..."
-    Remove-AllImages
+    if(Connect-ToAzure){
+        Write-Host "Connected to Azure."
+        Remove-AllImages
+    } else {
+        Write-Host "Couldn't connect to Azure. Check credentials are valid and in the correct format."
+    }
     Write-Host "Script finished."
 }
