@@ -47,47 +47,46 @@ Function Get-TagsToKeep($TagsList, $TagFilter, $NumberToKeep){
     }
 }
 
-Function Remove-AllImages(){
-    # Get all Tags in time descending order
-    $Tags = Get-Tags
+Function Remove-AllImages() {
+    if (Connect-ToAzure) {
+        # Get all Tags in time descending order
+        $Tags = Get-Tags
+        
+        # Identify Tags to keep
+        $TagsToKeep = Get-TagsToKeep -TagsList $Tags -TagFilter $TagToKeep -NumberToKeep $NumberImagesToKeep
+        
+        $ImagesDeleted = @()
+        $ImagesKept = @()
+        $ImageDeletionFails = @()
     
-    # Identify Tags to keep
-    $TagsToKeep = Get-TagsToKeep -TagsList $Tags -TagFilter $TagToKeep -NumberToKeep $NumberImagesToKeep
-    
-    $ImagesDeleted = @()
-    $ImagesKept = @()
-    $ImageDeletionFails = @()
-
-    # Delete images if they are older than $date or if the user wants to delete all images which do not include the TagToKeep
-    foreach ($Tag in $Tags){
-        # Initialise this at the start of the loop because concatenation is a bit weird if we try to do it in the middle of the az cli command.
-        # Also means we can reuse it.
-        $ImageNameTag = $Repository + ":" + $Tag
-    
-        if ($TagsToKeep -NotContains $Tag) {
-            $result = Remove-SingleImage -Image $ImageNameTag
-            # If the CLI command succeeded, then '$?' is true.
-            if ($result) {
-                $ImagesDeleted += $ImageNameTag
+        # Delete images if they are older than $date or if the user wants to delete all images which do not include the TagToKeep
+        foreach ($Tag in $Tags){
+            # Initialise this at the start of the loop because concatenation is a bit weird if we try to do it in the middle of the az cli command.
+            # Also means we can reuse it.
+            $ImageNameTag = $Repository + ":" + $Tag
+        
+            if ($TagsToKeep -NotContains $Tag) {
+                $result = Remove-SingleImage -Image $ImageNameTag
+                # If the CLI command succeeded, then '$?' is true.
+                if ($result) {
+                    $ImagesDeleted += $ImageNameTag
+                } else {
+                    $ImageDeletionFails += $ImageNameTag
+                }
             } else {
-                $ImageDeletionFails += $ImageNameTag
+                $ImagesKept += $ImageNameTag
             }
-        } else {
-            $ImagesKept += $ImageNameTag
         }
+        
+        return "Total Images: $($Tags.Count), Images Kept: $($ImagesKept.Count), Images Deleted: $($ImagesDeleted.Count), Image Deletion Fails: $($ImageDeletionFails.Count)"    
+    } else {
+        return "Couldn't connect to Azure. Check credentials are valid and in the correct format."
     }
-    
-    return "Total Images: $($Tags.Count), Images Kept: $($ImagesKept.Count), Images Deleted: $($ImagesDeleted.Count), Image Deletion Fails: $($ImageDeletionFails.Count)"
 }
 
 # Only run cleanup if we're not testing
 if ($Testing -eq $false) {
     Write-Host "Live run, script began..."
-    if(Connect-ToAzure){
-        Write-Host "Connected to Azure."
-        Remove-AllImages
-    } else {
-        Write-Host "Couldn't connect to Azure. Check credentials are valid and in the correct format."
-    }
+    Remove-AllImages
     Write-Host "Script finished."
 }

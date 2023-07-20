@@ -26,6 +26,7 @@ BeforeAll {
     # Set up default mocks
     Mock Get-Tags -MockWith { $TestTags }
     Mock Remove-SingleImage { return $true }
+    Mock Connect-ToAzure { return $true }
 }
 
 Describe "Get-TagsToKeep" {    
@@ -137,5 +138,16 @@ Describe "Remove-AllImages" {
 
         # Assert
         $result | Should -Be "Total Images: $($TestTags.Count), Images Kept: 0, Images Deleted: $($TestTags.Count), Image Deletion Fails: 0"
+    }
+
+    It "Azure login fails" {
+        # Arrange
+        Mock Connect-ToAzure { return $false}
+
+        # Act
+        $result = Remove-AllImages
+
+        # Assert
+        $result | Should -Be "Couldn't connect to Azure. Check credentials are valid and in the correct format."
     }
 }
