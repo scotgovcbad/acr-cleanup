@@ -2,6 +2,9 @@ name: 'Azure Container Registry Cleanup'
 description: 'An action which will clean-up the given Azure Container Registry repository. It will find the date of the n-th most recent container image whose tag contains a given string and purge all container images created before that date.'
 
 inputs:
+  azure-credentials:
+    description: Credentials used to log in to Azure
+    required: true
   number-to-keep:
     description: 'The number of images matching your tag input which you would like to keep'
     required: true
@@ -33,4 +36,6 @@ runs:
 
   - name: Cleanse images from Azure Container Registry
     shell: pwsh
+    env:
+      AZURE_CREDS: ${{ inputs.azure-credentials }}
     run: /home/runner/work/_actions/scotgovcbad/acr-cleanup/master/AcrCleanupScript.ps1 -ContainerRegistry ${{ inputs.container-registry }} -Repository ${{ inputs.repo }} -Strictness ${{ inputs.strictness }} -TagToKeep ${{ inputs.tag }} -NumberImagesToKeep ${{ inputs.number-to-keep }}

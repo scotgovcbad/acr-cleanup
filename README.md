@@ -47,12 +47,13 @@ jobs:
     steps:
     - uses: actions/checkout@master   
 
-    - name: Cleanse Container Registry Repo
-      uses: scotgovcbad/acr-cleanup@master
+    - name: Run cleansing action
+      uses: scotgovcbad/acr-cleanup@Add-az-login
       with:
-        ContainerRegistry: "myContainerRegistry"
-        Repository: "myRepo"
-        Strictness: "Lenient"
-        TagToKeep: "v1"
-        NumberImagesToKeep: 3 
+        azure-credentials: ${{ secrets.ACTUAL_AZURE_CREDENTIALS }}
+        container-registry: "cbadcontainerregistry"
+        repository: "wsw"
+        tag: "v"
+        number-to-keep: 100
+        strictness: "Lenient"
 ```
