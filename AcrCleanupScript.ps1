@@ -20,11 +20,11 @@ Function Remove-SingleImage($Image){
 }
 
 # Yet another wrapper to assist mocking
-Function Connect-ToAzure() {
-    $creds = ConvertFrom-Json -InputObject $env:AZURE_CREDS    
-    az login --service-principal -u $creds.clientId -p $creds.clientSecret --tenant $creds.tenantId
-    return ($? -eq $true)
-}
+# Function Connect-ToAzure() {
+#     $creds = ConvertFrom-Json -InputObject $env:AZURE_CREDS    
+#     az login --service-principal -u $creds.clientId -p $creds.clientSecret --tenant $creds.tenantId
+#     return ($? -eq $true)
+# }
 
 Function Get-TagsToKeep($TagsList, $TagFilter, $NumberToKeep){
     if ($NumberToKeep -eq 0){
@@ -48,7 +48,7 @@ Function Get-TagsToKeep($TagsList, $TagFilter, $NumberToKeep){
 }
 
 Function Remove-AllImages() {
-    if (Connect-ToAzure) {
+    #if (Connect-ToAzure) {
         # Get all Tags in time descending order
         $Tags = Get-Tags
         
@@ -79,9 +79,9 @@ Function Remove-AllImages() {
         }
         
         return "Total Images: $($Tags.Count), Images Kept: $($ImagesKept.Count), Images Deleted: $($ImagesDeleted.Count), Image Deletion Fails: $($ImageDeletionFails.Count)"    
-    } else {
-        return "Couldn't connect to Azure. Check credentials are valid and in the correct format."
-    }
+    #} else {
+    #    return "Couldn't connect to Azure. Check credentials are valid and in the correct format."
+    #}
 }
 
 # Only run cleanup if we're not testing
