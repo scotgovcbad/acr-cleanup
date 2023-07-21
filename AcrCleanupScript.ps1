@@ -27,6 +27,7 @@ Function Remove-SingleImage($Image){
 # }
 
 Function Get-TagsToKeep($TagsList, $TagFilter, $NumberToKeep){
+    Write-Host "Filtering tags..."
     if ($NumberToKeep -eq 0){
         return @()
     }
