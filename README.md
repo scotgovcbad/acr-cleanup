@@ -52,7 +52,7 @@ jobs:
       with:
         azure-credentials: ${{ secrets.ACTUAL_AZURE_CREDENTIALS }}
         container-registry: "cbadcontainerregistry"
-        repository: "wsw"
+        repo: "wsw"
         tag: "v"
         number-to-keep: 100
         strictness: "Lenient"
